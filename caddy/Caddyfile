@@ -1,6 +1,19 @@
 # Used by docker-compose.https.yml. Caddy gets and renews the certificate for DOMAIN by itself and
 # redirects http to https.
+{
+    order coraza_waf first
+}
+
 {$DOMAIN} {
+  coraza_waf {
+    load_owasp_crs
+    directives `
+      Include @coraza.conf-recommended
+      Include @crs-setup.conf.example
+      Include @owasp_crs/*.conf
+      SecRuleEngine On
+    `
+  }
 	encode zstd gzip
 
 	# Browsers that have visited once refuse plain http for this host for a year.
